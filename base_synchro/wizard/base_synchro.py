@@ -28,6 +28,9 @@ from openerp.tools import frozendict
 from openerp import models, fields, api
 from openerp.osv import osv
 from openerp.tools.translate import _
+from openerp.tools.safe_eval import safe_eval as eval
+import logging
+_logger = logging.getLogger(__name__)
 
 class RPCProxyOne(object):
     def __init__(self, server, ressource):
@@ -184,7 +187,9 @@ class base_synchro(models.TransientModel):
             # If not synchronized, try to find it with name_get/name_search
             #
             names = pool_src.get(obj_model).name_get(self._cr, self.user_id.id, [res_id])[0][1]
-            res = pool_dest.get(obj_model).name_search(self._cr, self.user_id.id, names, [], 'like')
+            res = pool_dest.get(obj_model)
+            if res:
+                res = res.name_search(self._cr, self.user_id.id, names, [], 'like')
             if res:
                 result = res[0][0]
             else:
