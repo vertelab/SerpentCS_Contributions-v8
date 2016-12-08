@@ -87,7 +87,10 @@
                             <field colspan="4" name="domain"/>
                             <field name="synchronize_date"/>
                         </group>
-                        <separator string="Fields Not Sync."/>
+                        <separator string="Fields Blacklist" attrs="{'invisible': [('whitelist', '=', False)]}"/>
+                        <separator string="Fields Whitelist" attrs="{'invisible': [('whitelist', '=', True)]}"/>
+                        <label for="whitelist"/>
+                        <field name="whitelist"/>
                         <field name="avoid_ids">
                             <tree string="Fields" editable="bottom">
                                 <field name="name"/>

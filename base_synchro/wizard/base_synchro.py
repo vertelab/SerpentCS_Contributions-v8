@@ -132,7 +132,7 @@ class base_synchro(models.TransientModel):
                 pass
             # Filter fields to not sync
             for field in object.avoid_ids:
-                if field.name in value:
+                if (field.name in value and not object.whitelist) or (field.name not in value and object.whitelist):
                     del value[field.name]
             if id2:
                 # try:

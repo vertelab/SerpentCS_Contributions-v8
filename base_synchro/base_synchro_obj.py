@@ -52,6 +52,7 @@ class base_synchro_obj(models.Model):
     synchronize_date = fields.Datetime('Latest Synchronization', readonly=True)
     line_id = fields.One2many('base.synchro.obj.line', 'obj_id', 'IDs Affected', ondelete='cascade')
     avoid_ids = fields.One2many('base.synchro.obj.avoid', 'obj_id', 'Fields Not Sync.')
+    whitelist = fields.Boolean('Whitelist / Blacklist', help="Checking this box will make the fields list a whitelist instead of blacklist.")
 
     #
     # Return a list of changes: [ (date, id) ]
