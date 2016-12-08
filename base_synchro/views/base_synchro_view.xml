@@ -73,7 +73,7 @@
         <menuitem action="action_base_synchro_obj_line_tree" id="menu_action_base_synchro_obj_line_tree" parent="base_synchro.next_id_63"/>
 
         <!-- form view of base synchro obj -->
-        <record id="base_synchro_obj_form" model="ir.ui.view">
+        <record id="view_transfer_form" model="ir.ui.view">
             <field name="name">base.synchro.obj.form</field>
             <field name="model">base.synchro.obj</field>
             <field name="arch" type="xml">
@@ -89,7 +89,10 @@
                             <field colspan="4" name="domain"/>
                             <field name="synchronize_date"/>
                         </group>
-                        <separator string="Fields Not Sync."/>
+                        <separator string="Fields Blacklist" attrs="{'invisible': [('whitelist', '=', False)]}"/>
+                        <separator string="Fields Whitelist" attrs="{'invisible': [('whitelist', '=', True)]}"/>
+                        <label for="whitelist"/>
+                        <field name="whitelist"/>
                         <field name="avoid_ids">
                             <tree string="Fields" editable="bottom">
                                 <field name="name"/>
