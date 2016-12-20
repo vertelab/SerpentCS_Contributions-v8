@@ -131,9 +131,15 @@ class base_synchro(models.TransientModel):
             if not (iii % 50):
                 pass
             # Filter fields to not sync
+            _logger.warn('Value %s' % value)
             for field in object.avoid_ids:
-                if (field.name in value and not object.whitelist) or (field.name not in value and object.whitelist):
-                    del value[field.name]
+                if value.get(field.name):
+                    if not object.whitelist:  # False == Whitelist
+                        if field.name not in value.keys():
+                            del value[field.name]
+                    else:
+                        if field.name in value.keys():
+                            del value[field.name]
             if id2:
                 # try:
                 pool_dest.get(object.model_id.model).write(self._cr, self.user_id.id, [id2], value)
