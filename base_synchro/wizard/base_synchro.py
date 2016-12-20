@@ -132,12 +132,12 @@ class base_synchro(models.TransientModel):
                 pass
             # Filter fields to not sync
             _logger.warn('Value %s' % value)
-            if not object.whitelist: # False == Whitelist
-                for field in values.keys():
+            if object.whitelist: 
+                for field in value.keys():
                     if field not in object.avoid_ids.mapped('name'): # Whitelist
                         del value[field]
             else:
-                for field in object.avoid_ids:  # Blacklist
+                for field in object.avoid_ids:                       # Blacklist
                     if field.name in value.keys():
                         del value[field.name]                
             if id2:
