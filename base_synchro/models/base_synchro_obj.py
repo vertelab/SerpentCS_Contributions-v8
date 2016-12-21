@@ -53,7 +53,7 @@ class base_synchro_obj(models.Model):
     line_id = fields.One2many('base.synchro.obj.line', 'obj_id', 'IDs Affected', ondelete='cascade')
     avoid_ids = fields.One2many('base.synchro.obj.avoid', 'obj_id', 'Fields Not Sync.')
     whitelist = fields.Boolean('Whitelist', help="Checking this box will make the fields list a whitelist instead of blacklist.")
-
+    placeholder_ids = fields.One2many('base.synchro.obj.placeholder', 'obj_id', 'Fields Placeholder Values')
     #
     # Return a list of changes: [ (date, id) ]
     #
@@ -80,6 +80,21 @@ class base_synchro_obj(models.Model):
         for r in obj_rec.read(['create_date', 'write_date']):
             result.append((r['write_date'] or r['create_date'], r['id'], action.get('action', 'd')))
         return result
+
+class base_synchro_obj_placeholder(models.Model):
+    _name = "base.synchro.obj.placeholder"
+    _description = "Placeholder values on fields"
+
+    name = fields.Char('Field Name', select=1, required=True)
+    obj_id = fields.Many2one('base.synchro.obj', 'Object', required=True, ondelete='cascade')
+    type = fields.Selection([('integer', 'Integer'), ('float', 'Float')], 'Value Type', required = True)
+    float = fields.Float('Float Value')
+    integer = fields.Integer('Integer Value')
+    
+    @api.multi
+    def get_placeholder_value(self):
+        self.ensure_one()
+        return getattr(self, self.type)
 
 class base_synchro_obj_avoid(models.Model):
     _name = "base.synchro.obj.avoid"

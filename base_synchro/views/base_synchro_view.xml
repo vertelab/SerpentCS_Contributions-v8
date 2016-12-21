@@ -98,6 +98,14 @@
                                 <field name="name"/>
                             </tree>
                         </field>
+                        <field name="placeholder_ids">
+                            <tree string="Placeholder Values" editable="bottom">
+                              <field name="name"/>
+                              <field name="type"/>
+                              <field name="integer"/>
+                              <field name="float"/>
+                            </tree>
+                        </field>
                     </sheet>
                 </form>
             </field>

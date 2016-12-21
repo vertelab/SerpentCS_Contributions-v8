@@ -150,6 +150,8 @@ class base_synchro(models.TransientModel):
             else:
 #                value_encode = self.input(ids, value)
 #                idnew = pool_dest.get(object.model_id.model).create(self._cr, self.user_id.id, value_encode)
+                for placeholder in object.placeholder_ids:
+                    value[placeholder.name] = placeholder.get_placeholder_value()
                 idnew = pool_dest.get(object.model_id.model).create(self._cr, self.user_id.id, value)
                 self.env['base.synchro.obj.line'].create({
                     'obj_id': object.id,
