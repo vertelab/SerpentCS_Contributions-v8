@@ -305,4 +305,12 @@ Exceptions:
             'type': 'ir.actions.act_window',
             'target': 'new',
         }
+    
+    @api.model
+    def run_synchronization(self, server_id, user_id):
+        self.env['base.synchro'].create({
+            'server_url': server_id,
+            'user_id': user_id,
+        }).upload_download_multi_thread()
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

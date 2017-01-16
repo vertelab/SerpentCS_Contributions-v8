@@ -98,6 +98,7 @@
                                 <field name="name"/>
                             </tree>
                         </field>
+                        <separator string="Placeholder Values"/>
                         <field name="placeholder_ids">
                             <tree string="Placeholder Values" editable="bottom">
                               <field name="name"/>
