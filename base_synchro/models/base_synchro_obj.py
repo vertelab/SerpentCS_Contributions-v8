@@ -22,6 +22,8 @@
 
 import time
 from openerp import models, fields, api
+import logging
+_logger = logging.getLogger(__name__)
 
 class base_synchro_server(models.Model):
     '''Class to store the information regarding server'''
@@ -71,14 +73,11 @@ class base_synchro_obj(models.Model):
         POOL = self.env[obj]
         result = []
         if dt:
-            domain2 = domain + [('write_date', '>=', dt)]
-            domain3 = domain + [('create_date', '>=', dt)]
-        else:
-            domain2 = domain3 = domain
-        obj_rec = POOL.search(domain2)
-        obj_rec += POOL.search(domain3)
-        for r in obj_rec.read(['create_date', 'write_date']):
-            result.append((r['write_date'] or r['create_date'], r['id'], action.get('action', 'd')))
+            domain += ['|', ('write_date', '>=', dt), ('create_date', '>=', dt)]
+        obj_rec = POOL.search(domain, order='id')
+        _logger.debug(obj_rec)
+        for r in obj_rec:
+            result.append((r.write_date or r.create_date, r.id, action.get('action', 'd')))
         return result
 
 class base_synchro_obj_placeholder(models.Model):

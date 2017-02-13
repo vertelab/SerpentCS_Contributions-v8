@@ -131,7 +131,7 @@ class base_synchro(models.TransientModel):
             if not (iii % 50):
                 pass
             # Filter fields to not sync
-            _logger.warn('Value %s' % value)
+            _logger.debug('Value %s' % value)
             if object.whitelist: 
                 for field in value.keys():
                     if field not in object.avoid_ids.mapped('name'): # Whitelist
@@ -142,6 +142,7 @@ class base_synchro(models.TransientModel):
                         del value[field.name]                
             if id2:
                 # try:
+                _logger.debug('write to %s: %s' % (id2, value))
                 pool_dest.get(object.model_id.model).write(self._cr, self.user_id.id, [id2], value)
                 # except Exception, e:
                 # self.report.append('ERROR: Unable to update record ['+str(id2)+']:'+str(value.get('name', '?')))
@@ -152,6 +153,7 @@ class base_synchro(models.TransientModel):
 #                idnew = pool_dest.get(object.model_id.model).create(self._cr, self.user_id.id, value_encode)
                 for placeholder in object.placeholder_ids:
                     value[placeholder.name] = placeholder.get_placeholder_value()
+                _logger.debug('create: %s' % value)
                 idnew = pool_dest.get(object.model_id.model).create(self._cr, self.user_id.id, value)
                 self.env['base.synchro.obj.line'].create({
                     'obj_id': object.id,
@@ -258,7 +260,7 @@ class base_synchro(models.TransientModel):
             if obj_rec.action == 'b':
                 time.sleep(1)
                 dt = time.strftime('%Y-%m-%d %H:%M:%S')
-            self.env['base.synchro.obj'].write({'synchronize_date': dt})
+            obj_rec.write({'synchronize_date': dt})
         end_date = time.strftime('%Y-%m-%d, %Hh %Mm %Ss')
 #        return {}
         if syn_obj.user_id:
