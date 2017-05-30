@@ -84,6 +84,7 @@
                             <field name="active" select="2"/>
                             <field name="server_id" select="2"/>
                             <field name="model_id" select="1"/>
+                            <field name="sync_unlink"/>
                             <field name="action"/>
                             <field name="sequence"/>
                             <field colspan="4" name="domain"/>

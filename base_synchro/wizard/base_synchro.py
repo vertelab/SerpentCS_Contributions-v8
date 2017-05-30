@@ -96,9 +96,22 @@ class base_synchro(models.TransientModel):
                 raise osv.except_osv(_('Warning'),
                              _('If your Synchronisation direction is download or both, please install \
                              "Multi-DB Synchronization" module in targeted server!'))
+            if object.sync_unlink:
+                instances = self.env['base.synchro.obj.line'].search([('obj_id', '=', object.id)])
+                deleted = pool1.get('base.synchro.obj').get_deleted_ids(self._cr, self.user_id, object.model_id.model, instances.mapped('remote_id'))
+                if deleted:
+                    instances = instances.filtered(lambda r: r.remote_id in deleted)
+                    l = str(tuple(instances.mapped('local_id')))
+                    if l[-2] == ',':
+                        l = l[:-2] + l[-1:]
+                    self.env.cr.execute("DELETE FROM %s WHERE ID IN %s;" % (self.env[object.model_id.model]._table, l))
+                    instances.unlink()
             ids = pool1.get('base.synchro.obj').get_ids(self._cr, self.user_id, object.model_id.model, object.synchronize_date, eval(object.domain), {'action':'d'})
 
         if object.action in ('u', 'b'):
+            if object.sync_unlink:
+                # TODO: Implement deletions on upload.
+                raise Warning("Deletion not yet implemented for uploads!")
             ids += pool2.get('base.synchro.obj').get_ids(self._cr, self.user_id.id, object.model_id.model, object.synchronize_date, eval(object.domain), {'action':'u'})
         ids.sort()
         iii = 0
@@ -251,19 +264,18 @@ class base_synchro(models.TransientModel):
     @api.multi
     def upload_download(self):
         start_date = time.strftime('%Y-%m-%d, %Hh %Mm %Ss')
-        syn_obj = self.browse(self.ids)[0]
 #        pool = pooler.get_pool(self.env.cr.dbname)
-        server = self.env['base.synchro.server'].browse(syn_obj.server_url.id)
-        for obj_rec in server.obj_ids:
+        server = self.server_url
+        for obj_rec in self.server_url.obj_ids:
             dt = time.strftime('%Y-%m-%d %H:%M:%S')
-            self.synchronize(server, obj_rec)
+            self.synchronize(self.server_url, obj_rec)
             if obj_rec.action == 'b':
                 time.sleep(1)
                 dt = time.strftime('%Y-%m-%d %H:%M:%S')
             obj_rec.write({'synchronize_date': dt})
         end_date = time.strftime('%Y-%m-%d, %Hh %Mm %Ss')
 #        return {}
-        if syn_obj.user_id:
+        if self.user_id:
             cr, uid, context = self.env.args
             request = pooler.get_pool(cr.dbname).get('res.request')
             if not self.report:
@@ -285,7 +297,7 @@ Exceptions:
                     'name' : "Synchronization report",
                     'act_from' : self.user_id.id,
                     'date': time.strftime('%Y-%m-%d, %H:%M:%S'),
-                    'act_to' : syn_obj.user_id.id,
+                    'act_to' : self.user_id.id,
                     'body': summary,
                 }, context=context)
             return {}

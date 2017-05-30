@@ -56,6 +56,14 @@ class base_synchro_obj(models.Model):
     avoid_ids = fields.One2many('base.synchro.obj.avoid', 'obj_id', 'Fields Not Sync.')
     whitelist = fields.Boolean('Whitelist', help="Checking this box will make the fields list a whitelist instead of blacklist.")
     placeholder_ids = fields.One2many('base.synchro.obj.placeholder', 'obj_id', 'Fields Placeholder Values')
+    sync_unlink = fields.Boolean(string='Sync Deletions', help="Checking this will look for and remove any deleted records before syncing new ones/updates.")
+    
+    @api.model
+    def get_deleted_ids(self, model, ids):
+        for x in self.env[model].search_read([('id', 'in', ids)], ['id']):
+            ids.remove(x['id'])
+        return ids
+    
     #
     # Return a list of changes: [ (date, id) ]
     #
